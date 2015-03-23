@@ -44,7 +44,7 @@ namespace TShockAPI
 	public class TShock : TerrariaPlugin
 	{
 		public static readonly Version VersionNum = Assembly.GetExecutingAssembly().GetName().Version;
-		public static readonly string VersionCodename = "2015!!";
+		public static readonly string VersionCodename = "nicatronTg hotfixes 4.2.8 in less than an hour edition";
 
 		public static string SavePath = "tshock";
 		private const string LogFormatDefault = "yyyy-MM-dd_HH-mm-ss";
@@ -77,6 +77,7 @@ namespace TShockAPI
 		public static StatTracker StatTracker = new StatTracker();
 		public static UpdateManager UpdateManager;
 		public static ILog Log;
+		public static TerrariaPlugin instance;
 		/// <summary>
 		/// Used for implementing REST Tokens prior to the REST system starting up.
 		/// </summary>
@@ -116,6 +117,7 @@ namespace TShockAPI
 			ServerSideCharacterConfig.StartingInventory.Add(new NetItem { netID = -13, prefix = 0, stack = 1 });
 			ServerSideCharacterConfig.StartingInventory.Add(new NetItem { netID = -16, prefix = 0, stack = 1 });
 			Order = 0;
+			instance = this;
 		}
 
 
@@ -200,15 +202,10 @@ namespace TShockAPI
 					throw new Exception("Invalid storage type");
 				}
 
-#if DEBUG       
-				var level = LogLevel.All;
-#else
-				var level = LogLevel.All & ~LogLevel.Debug;
-#endif
 				if (Config.UseSqlLogs)
-					Log = new SqlLog(level, DB, logFilename, LogClear);
+					Log = new SqlLog(DB, logFilename, LogClear);
 				else
-					Log = new TextLog(logFilename, level, LogClear);
+					Log = new TextLog(logFilename, LogClear);
 
 				if (File.Exists(Path.Combine(SavePath, "tshock.pid")))
 				{
@@ -261,7 +258,7 @@ namespace TShockAPI
 				ServerApi.Hooks.ProjectileSetDefaults.Register(this, OnProjectileSetDefaults);
 				ServerApi.Hooks.WorldStartHardMode.Register(this, OnStartHardMode);
 				ServerApi.Hooks.WorldSave.Register(this, SaveManager.Instance.OnSaveWorld);
-			  ServerApi.Hooks.WorldChristmasCheck.Register(this, OnXmasCheck);
+				ServerApi.Hooks.WorldChristmasCheck.Register(this, OnXmasCheck);
 				ServerApi.Hooks.WorldHalloweenCheck.Register(this, OnHalloweenCheck);
 				ServerApi.Hooks.NetNameCollision.Register(this, NetHooks_NameCollision);
 				Hooks.PlayerHooks.PlayerPreLogin += OnPlayerPreLogin;
@@ -483,7 +480,7 @@ namespace TShockAPI
 						if (path.IndexOfAny(Path.GetInvalidPathChars()) == -1)
 						{
 							SavePath = path;
-							Log.ConsoleInfo("Config path has been set to " + path);
+							ServerApi.LogWriter.PluginWriteLine(this, "Config path has been set to " + path, TraceLevel.Info);
 						}
 						break;
 
@@ -492,7 +489,7 @@ namespace TShockAPI
 						if (path.IndexOfAny(Path.GetInvalidPathChars()) == -1)
 						{
 							Main.WorldPath = path;
-							Log.ConsoleInfo("World path has been set to " + path);
+							ServerApi.LogWriter.PluginWriteLine(this, "World path has been set to " + path, TraceLevel.Info);
 						}
 						break;
 
@@ -501,7 +498,7 @@ namespace TShockAPI
 						if (path.IndexOfAny(Path.GetInvalidPathChars()) == -1)
 						{
 							LogPath = path;
-							Log.ConsoleInfo("Log path has been set to " + path);
+							ServerApi.LogWriter.PluginWriteLine(this, "Log path has been set to " + path, TraceLevel.Info);
 						}
 						break;
 
@@ -516,6 +513,8 @@ namespace TShockAPI
 					case "-dump":
 						ConfigFile.DumpDescriptions();
 						Permissions.DumpDescriptions();
+						ServerSideConfig.DumpDescriptions();
+						Environment.Exit(1);
 						break;
 				}
 			}
@@ -1229,7 +1228,7 @@ namespace TShockAPI
 				if (Main.ServerSideCharacter)
 				{
 					player.SendErrorMessage(
-						player.IgnoreActionsForInventory = "Server side characters is enabled! Please {0}register or {0}login to play!", Commands.Specifier);
+						player.IgnoreActionsForInventory = String.Format("Server side characters is enabled! Please {0}register or {0}login to play!", Commands.Specifier));
 					player.LoginHarassed = true;
 				}
 				else if (Config.RequireLogin)

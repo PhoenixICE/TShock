@@ -2300,7 +2300,7 @@ namespace TShockAPI
 				if (TShock.Itembans.ItemIsBanned(args.TPlayer.inventory[item].name, args.Player))
 				{
 					control[5] = false;
-					args.Player.Disable("Using banned item");
+					args.Player.Disable("Using an item that your rank cannot use");
 					args.Player.SendErrorMessage("You cannot use {0} on this server. Your actions are being ignored.",
 						args.TPlayer.inventory[item].name);
 				}

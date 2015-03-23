@@ -823,7 +823,7 @@ namespace TShockAPI
 			SetBuff(23, 330, true); //Cursed
 			SetBuff(47, 330, true); //Frozen
 
-			if (ActiveChest != -1)
+			if (IsLoggedIn)
 			{
 				SendData(PacketTypes.ChestOpen, "", -1);
 			}

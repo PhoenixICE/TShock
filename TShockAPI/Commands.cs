@@ -222,12 +222,12 @@ namespace TShockAPI
 			});
 
 			#region Account Commands
-			add(new Command(Permissions.canlogin, AttemptLogin, "login")
-			{
-				AllowServer = false,
-				DoLog = false,
-				HelpText = "Logs you into an account."
-			});
+			//add(new Command(Permissions.canlogin, AttemptLogin, "login")
+			//{
+			//	AllowServer = false,
+			//	DoLog = false,
+			//	HelpText = "Logs you into an account."
+			//});
 			add(new Command(Permissions.canchangepassword, PasswordUser, "password")
 			{
 				AllowServer = false,
